@@ -5,6 +5,9 @@
 <a href="https://github.com/anyscale/multimodal-ai" role="button"><img src="https://img.shields.io/static/v1?label=&amp;message=View%20On%20GitHub&amp;color=586069&amp;logo=github&amp;labelColor=2f363d"></a>&nbsp;
 </div>
 
+💻 Run this entire tutorial on [Anyscale](https://www.anyscale.com/) for free:
+**https://console.anyscale.com/template-preview/image-search-and-classification**
+
 This tutorial focuses on the fundamental challenges of multimodal AI workloads at scale:
 
 - **🔋 Compute**: managing heterogeneous clusters, reducing idle time, and handling complex dependencies

@@ -3,15 +3,15 @@ from urllib.parse import urlparse
 import mlflow
 import numpy as np
 import torch
-from fastapi import FastAPI
-from PIL import Image
-from ray import serve
-from starlette.requests import Request
-from transformers import CLIPModel, CLIPProcessor
-
 from doggos.infer import TorchPredictor
 from doggos.model import collate_fn
 from doggos.utils import url_to_array
+from fastapi import FastAPI
+from PIL import Image
+from starlette.requests import Request
+from transformers import CLIPModel, CLIPProcessor
+
+from ray import serve
 
 # Define app
 api = FastAPI(
@@ -44,10 +44,14 @@ class ClassPredictor:
 
     def get_probabilities(self, url):
         image = Image.fromarray(np.uint8(url_to_array(url=url))).convert("RGB")
-        inputs = self.processor(images=[image], return_tensors="pt", padding=True).to(self.device)
+        inputs = self.processor(images=[image], return_tensors="pt", padding=True).to(
+            self.device
+        )
         with torch.inference_mode():
             embedding = self.model.get_image_features(**inputs).cpu().numpy()
-        probabilities = self.predictor.predict_probabilities(collate_fn({"embedding": embedding}))
+        probabilities = self.predictor.predict_probabilities(
+            collate_fn({"embedding": embedding})
+        )
         return probabilities
 
 

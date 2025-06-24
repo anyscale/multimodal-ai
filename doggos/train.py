@@ -5,14 +5,14 @@ import tempfile
 
 import mlflow
 import numpy as np
-import ray
 import torch
 import torch.nn.functional as F
-from ray.train.torch import TorchTrainer
-
 from doggos.data import Preprocessor
 from doggos.model import ClassificationModel, collate_fn
 from doggos.utils import add_class, set_seeds
+from ray.train.torch import TorchTrainer
+
+import ray
 
 
 def train_epoch(ds, batch_size, model, num_classes, loss_fn, optimizer):
@@ -38,7 +38,9 @@ def eval_epoch(ds, batch_size, model, num_classes, loss_fn):
     with torch.inference_mode():
         for i, batch in enumerate(ds_generator):
             z = model(batch)
-            targets = F.one_hot(batch["label"], num_classes=num_classes).float()  # one-hot (for loss_fn)
+            targets = F.one_hot(
+                batch["label"], num_classes=num_classes
+            ).float()  # one-hot (for loss_fn)
             J = loss_fn(z, targets).item()
             loss += (J - loss) / (i + 1)
             y_trues.extend(batch["label"].cpu().numpy())
@@ -84,13 +86,17 @@ def train_loop_per_worker(config):
     # Training components
     loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=lr_factor, patience=lr_patience)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode="min", factor=lr_factor, patience=lr_patience
+    )
 
     # Training
     best_val_loss = float("inf")
     for epoch in range(num_epochs):
         # Steps
-        train_loss = train_epoch(train_ds, batch_size, model, num_classes, loss_fn, optimizer)
+        train_loss = train_epoch(
+            train_ds, batch_size, model, num_classes, loss_fn, optimizer
+        )
         val_loss, _, _ = eval_epoch(val_ds, batch_size, model, num_classes, loss_fn)
         scheduler.step(val_loss)
 
@@ -166,7 +172,9 @@ if __name__ == "__main__":
     val_ds = preprocessor.transform(ds=val_ds)
 
     # Write processed data to cloud storage
-    preprocessed_data_path = os.path.join("/mnt/cluster_storage", "doggos/preprocessed_data")
+    preprocessed_data_path = os.path.join(
+        "/mnt/cluster_storage", "doggos/preprocessed_data"
+    )
     if os.path.exists(preprocessed_data_path):
         shutil.rmtree(preprocessed_data_path)  # clean up
     preprocessed_train_path = os.path.join(preprocessed_data_path, "preprocessed_train")
