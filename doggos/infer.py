@@ -19,21 +19,17 @@ class TorchPredictor:
     def predict_probabilities(self, batch):
         predicted_probabilities = self.model.predict_probabilities(collate_fn(batch))
         batch["probabilities"] = [
-            {
-                self.preprocessor.label_to_class[i]: float(prob)
-                for i, prob in enumerate(probabilities)
-            }
-            for probabilities in predicted_probabilities
+            {self.preprocessor.label_to_class[i]: float(prob) for i, prob in enumerate(probabilities)} for probabilities in predicted_probabilities
         ]
         return batch
-    
+
     @classmethod
     def from_artifacts_dir(cls, artifacts_dir, device="cuda"):
         with open(os.path.join(artifacts_dir, "class_to_label.json"), "r") as fp:
             class_to_label = json.load(fp)
         preprocessor = Preprocessor(class_to_label=class_to_label)
         model = ClassificationModel.load(
-            args_fp=os.path.join(artifacts_dir, "args.json"), 
+            args_fp=os.path.join(artifacts_dir, "args.json"),
             state_dict_fp=os.path.join(artifacts_dir, "model.pt"),
         )
         return cls(preprocessor=preprocessor, model=model, device=device)

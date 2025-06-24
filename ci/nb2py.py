@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+
 import nbformat
 
 
@@ -18,11 +19,7 @@ def convert_notebook(input_path: str, output_path: str) -> None:
 
             lines = cell.source.splitlines()
             # Skip cells that load or autoreload extensions
-            if any(
-                l.strip().startswith("%load_ext autoreload")
-                or l.strip().startswith("%autoreload all")
-                for l in lines
-            ):
+            if any(l.strip().startswith("%load_ext autoreload") or l.strip().startswith("%autoreload all") for l in lines):
                 continue
 
             # Detect a %%bash cell

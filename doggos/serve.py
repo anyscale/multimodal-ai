@@ -1,13 +1,12 @@
 from urllib.parse import urlparse
 
 import mlflow
+import numpy as np
+import torch
 from fastapi import FastAPI
+from PIL import Image
 from ray import serve
 from starlette.requests import Request
-
-import numpy as np
-from PIL import Image
-import torch
 from transformers import CLIPModel, CLIPProcessor
 
 from doggos.infer import TorchPredictor
@@ -23,10 +22,10 @@ api = FastAPI(
 
 
 @serve.deployment(
-    num_replicas="1", 
+    num_replicas="1",
     ray_actor_options={
-        "num_cpus": 4, 
-        "num_gpus": 1, 
+        "num_cpus": 4,
+        "num_gpus": 1,
         "accelerator_type": "L4",
     },
 )

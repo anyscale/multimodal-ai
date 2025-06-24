@@ -37,7 +37,7 @@ def get_top_matches(query_embedding, embeddings_ds, class_filters=None, n=4):
     if class_filters:
         class_filters = set(class_filters)
         rows = [r for r in rows if r["class"] in class_filters]
-    if not rows:                             
+    if not rows:
         return []
 
     # Vectorise
